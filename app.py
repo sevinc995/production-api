@@ -1,5 +1,5 @@
 from flask import Flask, jsonify
-from flask_cors import flask_cors
+from flask_cors import CORS
 import psycopg2
 import os
 from dotenv import load_dotenv
@@ -17,17 +17,17 @@ def get_db_connection():
     try:
         conn = psycopg2.connect(
             host = os.getenv('PGHOST'),
-            USE = OS.getenv('PGUSER'),
+            user = os.getenv('PGUSER'),
             database = os.getenv('PGDATABASE'),
             password = os.getenv('PGPASSWORD'),
-            port = os.getenv('PGPORT')
+            port = os.getenv('PGPORT'),
             sslmode = 'require'
         )
     
         return conn
 
     except Exception as e:
-        print(f"Database connection error: (e)")
+        print(f"Database connection error: {e}")
         return None
 
 @app.route("/api/news", methods=["GET"])
@@ -50,4 +50,21 @@ def get_news():
 
         conn.close()
 
-        
+        news_list = []
+
+        for item in news:
+            news_list.append({
+                "id": item[0],
+                "title": item[1],
+                "description": item[2],
+                "image": item[3]
+            })
+        return jsonify({
+            "news": news_list
+        })
+    except Exception as e:
+        return jsonify({"error":str(e)}), 500
+if __name__ == "__main__":
+    app.run(debug=True)
+else:
+    application = app
