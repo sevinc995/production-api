@@ -35,12 +35,12 @@ def get_news():
 
 
     try:
-        conn = get_db_connection()
+        connection = get_db_connection()
 
         if connection is None:
             return jsonify({"error": "Database connection failed"}), 500
 
-        cursor = conn.cursor()
+        cursor = connection.cursor()
 
         cursor.execute("SELECT id, title, description, image FROM news")
 
@@ -48,7 +48,7 @@ def get_news():
 
         cursor.close()
 
-        conn.close()
+        connection.close()
 
         news_list = []
 
